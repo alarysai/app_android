@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Histórico</string>
+    <string name="history_signed_out_title">Entre na sua conta</string>
+    <string name="history_signed_out_body">Seu histórico de gerações e seus créditos aparecem aqui depois que você entrar.</string>
+    <string name="history_balance_title">Seu saldo</string>
+    <string name="history_tab_generations">Gerações</string>
+    <string name="history_tab_statement">Extrato</string>
+    <string name="history_empty_generations">Nenhuma geração ainda</string>
+    <string name="history_empty_statement">Nenhuma movimentação ainda</string>
+    <string name="history_empty_body">Quando você gerar conteúdo, ele aparece aqui.</string>
+    <string name="history_untitled">Questionário</string>
+    <string name="history_open_result">Abrir resultado</string>
+    <string name="history_delete">Apagar</string>
+    <string name="history_cancel">Cancelar</string>
+    <string name="history_delete_title">Apagar do histórico?</string>
+    <string name="history_delete_body">\"%1$s\" sai do seu histórico. Os créditos usados não voltam.</string>
+    <string name="history_delete_failed">Não foi possível apagar. Tente de novo.</string>
+    <string name="history_balance_after">Saldo: %1$d</string>
+    <string name="history_output_text">Texto</string>
+    <string name="history_output_image">Imagem</string>
+    <string name="history_output_video">Vídeo</string>
+    <string name="history_output_slides">Apresentação</string>
+    <string name="history_output_other">Outro</string>
+    <string name="history_credit_purchase">Compra de créditos</string>
+    <string name="history_credit_usage">Uso</string>
+    <string name="history_credit_monthly_grant">Créditos do mês</string>
+    <string name="history_credit_bonus">Bônus</string>
+    <string name="history_credit_refund">Estorno</string>
+    <string name="history_credit_other">Ajuste</string>
+    <plurals name="history_credits_spent">
+        <item quantity="one">%d crédito</item>
+        <item quantity="other">%d créditos</item>
+    </plurals>
+    <plurals name="history_balance">
+        <item quantity="one">%d crédito</item>
+        <item quantity="other">%d créditos</item>
+    </plurals>
+</resources>

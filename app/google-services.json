@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "401658602082",
+    "project_id": "alarysai-b6e85",
+    "storage_bucket": "alarysai-b6e85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401658602082:android:f2ca19f4d7737b486e273b",
+        "android_client_info": {
+          "package_name": "com.alarys.alarysai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "401658602082-4d9eq0076cabjr6v11ug6mi2upm3f8ub.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5ETLwTCaALZnyrETqbOI6t6VyGuGmNGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "401658602082-4d9eq0076cabjr6v11ug6mi2upm3f8ub.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401658602082:android:5e4d6f50ce7f59b96e273b",
+        "android_client_info": {
+          "package_name": "com.alarysai.alarysai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "401658602082-4d9eq0076cabjr6v11ug6mi2upm3f8ub.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5ETLwTCaALZnyrETqbOI6t6VyGuGmNGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "401658602082-4d9eq0076cabjr6v11ug6mi2upm3f8ub.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

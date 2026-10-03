@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="advertisers_open_link">Abrir el sitio</string>
+    <string name="advertisers_other_type">Otros</string>
+    <string name="advertisers_empty_title">Aún no hay anunciantes</string>
+    <string name="advertisers_empty_body">Socios y patrocinadores aparecen aquí en cuanto se registran.</string>
+</resources>

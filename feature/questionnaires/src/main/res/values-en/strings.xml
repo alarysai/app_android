@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="questionnaires_back">Back</string>
+    <string name="questionnaires_empty_title">No questionnaires in this category yet</string>
+    <string name="questionnaires_empty_body">New questionnaires show up here as soon as they\'re published.</string>
+    <string name="questionnaires_portuguese_only">In Portuguese</string>
+
+    <string name="run_back">Back</string>
+    <string name="run_close">Close</string>
+    <string name="run_skip">Skip</string>
+    <string name="run_progress">Question %1$d of %2$d</string>
+    <string name="run_percent">%1$d%%</string>
+    <string name="run_badge_single">Choose one</string>
+    <string name="run_badge_multiple">Choose one or more</string>
+    <string name="run_badge_open_text">Open answer</string>
+    <string name="run_badge_yes_no">Yes or no</string>
+    <string name="run_badge_video">Video</string>
+    <string name="run_watch_video">Watch the video</string>
+    <string name="run_dictate">Dictate the answer</string>
+    <string name="run_optional_hint">Optional — you can skip it.</string>
+    <string name="run_tip_title">Tip</string>
+    <string name="run_tip_with_label">Tip: %1$s</string>
+    <string name="run_continue">Continue</string>
+    <string name="run_review_request">Review request</string>
+    <string name="run_review_title">Review your request</string>
+    <string name="run_review_subtitle">Tap an answer to edit it.</string>
+    <string name="run_review_video_watched">Video watched</string>
+    <string name="run_review_skipped">Skipped</string>
+    <string name="run_chip_in_prompt">In the prompt</string>
+    <string name="run_chip_context_only">Context only</string>
+    <string name="run_prompt_preview_title">Prompt preview</string>
+    <string name="run_prompt_preview_note">Only answers marked for it go into the prompt. Alarys assembles the final text when generating.</string>
+    <string name="run_cost_label">Cost:</string>
+    <string name="run_generate">Generate with Alarys</string>
+    <string name="run_generate_coming_soon">Content generation is coming soon.</string>
+    <string name="run_exit_title">Leave the questionnaire?</string>
+    <string name="run_exit_body">The answers you\'ve given so far will be lost.</string>
+    <string name="run_exit_confirm">Leave</string>
+    <string name="run_exit_stay">Keep answering</string>
+    <string name="run_back_to_list">Back to questionnaires</string>
+    <string name="run_unavailable_title">Questionnaire unavailable</string>
+    <string name="run_unavailable_body">This questionnaire is no longer available.</string>
+    <plurals name="run_cost_credits">
+        <item quantity="one">%d credit</item>
+        <item quantity="other">%d credits</item>
+    </plurals>
+</resources>

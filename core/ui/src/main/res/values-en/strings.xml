@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_ui_retry">Try again</string>
+    <string name="core_ui_offline_notice">You\'re offline. Showing the last saved version.</string>
+    <string name="core_ui_error_offline_title">No connection</string>
+    <string name="core_ui_error_offline_body">The content will show up as soon as you\'re back online.</string>
+    <string name="core_ui_error_unavailable_title">Content unavailable</string>
+    <string name="core_ui_error_unavailable_body">This content is no longer available.</string>
+    <string name="core_ui_error_unknown_title">Couldn\'t load</string>
+    <string name="core_ui_error_unknown_body">Please try again in a moment.</string>
+</resources>

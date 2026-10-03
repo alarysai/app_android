@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_notifications">Notificaciones</string>
+    <string name="home_search_placeholder">Buscar recursos</string>
+    <string name="home_search_voice">Buscar por voz</string>
+    <string name="home_search_no_results">No se encontró nada para \"%1$s\"</string>
+
+    <string name="home_greeting_hello">Hola</string>
+    <string name="home_greeting_subtitle">¿Qué vamos a crear hoy?</string>
+
+    <string name="home_plan_title">Uso de tu plan</string>
+    <string name="home_plan_subtitle">Consumo de créditos en el ciclo mensual.</string>
+    <string name="home_plan_used">%1$d%% utilizado</string>
+    <string name="home_plan_available">%1$d%% disponible</string>
+    <plurals name="home_plan_credits">
+        <item quantity="one">%d crédito</item>
+        <item quantity="other">%d créditos</item>
+    </plurals>
+    <string name="home_plan_credits_label">disponibles</string>
+    <string name="home_plan_buy">Comprar créditos</string>
+    <string name="home_plan_unavailable">Tus créditos aparecerán aquí cuando inicies sesión.</string>
+
+    <string name="home_categories_empty_title">Aún no hay categorías</string>
+    <string name="home_categories_empty_body">Las nuevas categorías aparecen aquí en cuanto se publican.</string>
+
+    <string name="home_chat_title">Conversa con Alarys</string>
+    <string name="home_chat_placeholder">Escribe tu mensaje…</string>
+    <string name="home_chat_send">Enviar</string>
+    <string name="home_chat_voice">Dictar el mensaje</string>
+
+    <string name="home_coming_soon_chat">El chat con Alarys llegará pronto.</string>
+    <string name="home_coming_soon_notifications">Las notificaciones llegarán pronto.</string>
+    <string name="home_coming_soon_credits">La compra de créditos llegará pronto.</string>
+</resources>

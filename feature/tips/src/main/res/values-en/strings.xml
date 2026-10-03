@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_all">All</string>
+    <string name="tips_empty_title">No tips here yet</string>
+    <string name="tips_empty_body">New tips show up here as soon as they\'re published.</string>
+    <string name="tips_portuguese_only">In Portuguese</string>
+</resources>

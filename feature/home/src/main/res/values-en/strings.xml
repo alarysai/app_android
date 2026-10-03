@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_notifications">Notifications</string>
+    <string name="home_search_placeholder">Search features</string>
+    <string name="home_search_voice">Search by voice</string>
+    <string name="home_search_no_results">Nothing found for \"%1$s\"</string>
+
+    <string name="home_greeting_hello">Hi</string>
+    <string name="home_greeting_subtitle">What shall we create today?</string>
+
+    <string name="home_plan_title">Your plan usage</string>
+    <string name="home_plan_subtitle">Credits used this monthly cycle.</string>
+    <string name="home_plan_used">%1$d%% used</string>
+    <string name="home_plan_available">%1$d%% available</string>
+    <plurals name="home_plan_credits">
+        <item quantity="one">%d credit</item>
+        <item quantity="other">%d credits</item>
+    </plurals>
+    <string name="home_plan_credits_label">available</string>
+    <string name="home_plan_buy">Buy credits</string>
+    <string name="home_plan_unavailable">Your credits show up here once you sign in.</string>
+
+    <string name="home_categories_empty_title">No categories yet</string>
+    <string name="home_categories_empty_body">New categories show up here as soon as they\'re published.</string>
+
+    <string name="home_chat_title">Chat with Alarys</string>
+    <string name="home_chat_placeholder">Type your message…</string>
+    <string name="home_chat_send">Send</string>
+    <string name="home_chat_voice">Speak your message</string>
+
+    <string name="home_coming_soon_chat">Chat with Alarys is coming soon.</string>
+    <string name="home_coming_soon_notifications">Notifications are coming soon.</string>
+    <string name="home_coming_soon_credits">Buying credits is coming soon.</string>
+</resources>
