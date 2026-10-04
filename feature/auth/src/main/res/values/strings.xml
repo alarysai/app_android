@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_back">Voltar</string>
+    <string name="auth_or">ou</string>
+    <string name="auth_login_title">Bem-vindo de volta</string>
+    <string name="auth_login_subtitle">Entre para continuar criando com a Alarys.</string>
+    <string name="auth_email">E-mail</string>
+    <string name="auth_email_placeholder">voce@email.com</string>
+    <string name="auth_password">Senha</string>
+    <string name="auth_password_placeholder">Sua senha</string>
+    <string name="auth_show_password">Mostrar senha</string>
+    <string name="auth_hide_password">Ocultar senha</string>
+    <string name="auth_keep_signed_in">Manter conectado</string>
+    <string name="auth_forgot_password">Esqueci a senha</string>
+    <string name="auth_sign_in">Entrar</string>
+    <string name="auth_continue_with_google">Continuar com Google</string>
+    <string name="auth_no_account">Ainda não tem conta?</string>
+    <string name="auth_create_account">Criar conta</string>
+    <string name="auth_signup_title">Criar conta</string>
+    <string name="auth_signup_subtitle">Leva menos de um minuto.</string>
+    <string name="auth_name">Nome</string>
+    <string name="auth_name_placeholder">Como quer ser chamado</string>
+    <string name="auth_password_rule">Mínimo de %1$d caracteres</string>
+    <string name="auth_confirm_password">Confirmar senha</string>
+    <string name="auth_confirm_password_placeholder">Repita a senha</string>
+    <string name="auth_terms">Li e aceito a Política de Privacidade e os Termos de Uso, conforme a LGPD.</string>
+    <string name="auth_have_account">Já tem conta?</string>
+    <string name="auth_forgot_title">Recuperar senha</string>
+    <string name="auth_forgot_subtitle">Informe o e-mail da sua conta. Enviaremos um link para criar uma nova senha.</string>
+    <string name="auth_send_link">Enviar link</string>
+    <string name="auth_link_sent_title">Verifique seu e-mail</string>
+    <string name="auth_link_sent_body">Se existir uma conta para %1$s, você receberá um link para criar uma nova senha.</string>
+    <string name="auth_open_email_app">Abrir app de e-mail</string>
+    <string name="auth_resend">Reenviar</string>
+    <string name="auth_resend_in">Reenviar em %1$d:%2$02d</string>
+    <string name="auth_back_to_login">Voltar ao login</string>
+    <string name="auth_profile_setup_title">Seu perfil foi criado</string>
+    <string name="auth_profile_setup_subtitle">Confirme como quer ser chamado e o idioma do app. Dá para mudar depois.</string>
+    <string name="auth_profile_title">Seu perfil</string>
+    <string name="auth_profile_subtitle">Seu nome e o idioma dos conteúdos.</string>
+    <string name="auth_language">Idioma</string>
+    <string name="auth_language_pt" translatable="false">Português (Brasil)</string>
+    <string name="auth_language_en" translatable="false">English</string>
+    <string name="auth_language_es" translatable="false">Español</string>
+    <string name="auth_profile_start">Começar</string>
+    <string name="auth_profile_save">Salvar</string>
+    <string name="auth_profile_saved">Perfil salvo.</string>
+    <string name="auth_profile_save_failed">Não foi possível salvar. Verifique a conexão e tente de novo.</string>
+    <string name="auth_sign_out">Sair da conta</string>
+    <string name="auth_error_invalid_email">Informe um e-mail válido.</string>
+    <string name="auth_error_invalid_credentials">E-mail ou senha incorretos.</string>
+    <string name="auth_error_email_in_use">Já existe uma conta com este e-mail. Tente entrar.</string>
+    <string name="auth_error_weak_password">Escolha uma senha mais forte.</string>
+    <string name="auth_error_network">Sem conexão. Verifique a internet e tente de novo.</string>
+    <string name="auth_error_too_many_requests">Muitas tentativas. Aguarde um pouco e tente de novo.</string>
+    <string name="auth_error_google_unavailable">Não foi possível entrar com o Google neste aparelho.</string>
+    <string name="auth_error_unknown">Algo deu errado. Tente de novo.</string>
+    <string name="auth_error_name_missing">Informe seu nome.</string>
+    <string name="auth_error_passwords_differ">As senhas não são iguais.</string>
+</resources>

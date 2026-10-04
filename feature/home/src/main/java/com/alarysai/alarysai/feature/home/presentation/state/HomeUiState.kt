@@ -4,7 +4,7 @@ import com.alarysai.alarysai.core.common.content.ContentLoadError
 
 /** Single source of truth for the home screen. Each section renders independently. */
 data class HomeUiState(
-    /** Null until login exists: the greeting shows "Olá!" without a name. */
+    /** First name from the profile ("Olá, Marina"); null shows just "Olá!". */
     val userName: String? = null,
     val searchQuery: String = "",
     val categories: CategoriesSection = CategoriesSection.Loading,

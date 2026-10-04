@@ -5,6 +5,7 @@ import com.alarysai.alarysai.core.common.content.ContentList
 import com.alarysai.alarysai.core.common.content.ContentLoadError
 import com.alarysai.alarysai.core.common.content.ContentLoadException
 import com.alarysai.alarysai.core.common.session.SessionRepository
+import com.alarysai.alarysai.core.common.session.SessionUser
 import com.alarysai.alarysai.core.testing.MainDispatcherRule
 import com.alarysai.alarysai.feature.history.domain.model.CreditKind
 import com.alarysai.alarysai.feature.history.domain.model.CreditTransaction
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -40,6 +42,7 @@ class HistoryViewModelTest {
     private class FakeSession(initial: String?) : SessionRepository {
         val userId = MutableStateFlow(initial)
         override fun observeUserId(): Flow<String?> = userId
+        override fun observeUser(): Flow<SessionUser?> = userId.map { uid -> uid?.let { SessionUser(it, null, null) } }
     }
 
     /** Buffered so tryEmit succeeds while the ViewModel is subscribed. */

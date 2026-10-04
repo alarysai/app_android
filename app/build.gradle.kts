@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":feature:tips"))
     implementation(project(":feature:advertisers"))
     implementation(project(":feature:history"))
+    implementation(project(":feature:auth"))
 
     implementation(platform(libs.compose.bom))
 
@@ -70,7 +71,11 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
     implementation(libs.navigation.compose)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.lifecycle.runtime.compose)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+
+    testImplementation(project(":core:testing"))
 }

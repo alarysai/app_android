@@ -14,20 +14,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.alarysai.alarysai.core.designsystem.component.AlarysBackground
 import com.alarysai.alarysai.core.designsystem.component.AlarysBottomBar
 import com.alarysai.alarysai.core.designsystem.component.BottomBarItem
 import com.alarysai.alarysai.core.navigation.ClubRoute
 import com.alarysai.alarysai.core.navigation.HistoryRoute
+import com.alarysai.alarysai.core.navigation.ProfileRoute
 import com.alarysai.alarysai.core.navigation.HomeRoute
 import com.alarysai.alarysai.core.navigation.QuestionnaireRunRoute
 import com.alarysai.alarysai.core.navigation.QuestionnairesRoute
+import com.alarysai.alarysai.feature.auth.presentation.profile.profileDestination
 import com.alarysai.alarysai.feature.history.presentation.screen.historyDestination
 import com.alarysai.alarysai.feature.home.presentation.screen.homeDestination
 import com.alarysai.alarysai.feature.questionnaires.presentation.run.screen.questionnaireRunDestination
 import com.alarysai.alarysai.feature.questionnaires.presentation.screen.questionnairesDestination
 
-/** Root of the app: brand background, bottom bar and the tab destinations (Club AI shows tips and advertisers). */
+/** The signed-in app: bottom bar and the tab destinations (Club AI shows tips and advertisers). AppRoot draws the background. */
 @Composable
 fun AlarysNavHost() {
     val navController = rememberNavController()
@@ -40,48 +41,47 @@ fun AlarysNavHost() {
         BottomBarItem(key = tab.route.route, label = stringResource(tab.labelRes), icon = tab.icon)
     }
 
-    AlarysBackground {
-        Scaffold(
-            containerColor = Color.Transparent,
-            bottomBar = {
-                // The questionnaire run is full screen, with its own bottom actions.
-                if (currentRoute != QuestionnaireRunRoute.route) {
-                    AlarysBottomBar(
-                        items = items,
-                        selectedKey = selectedTabRoute,
-                        onItemClick = { navController.navigateToTab(it.key) },
-                    )
-                }
-            },
-        ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = HomeRoute.route,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
-            ) {
-                homeDestination(
-                    onOpenCategory = { categoryId, categoryName ->
-                        navController.navigate(QuestionnairesRoute.create(categoryId, categoryName))
-                    },
+    Scaffold(
+        containerColor = Color.Transparent,
+        bottomBar = {
+            // The questionnaire run is full screen, with its own bottom actions.
+            if (currentRoute != QuestionnaireRunRoute.route) {
+                AlarysBottomBar(
+                    items = items,
+                    selectedKey = selectedTabRoute,
+                    onItemClick = { navController.navigateToTab(it.key) },
                 )
-                questionnairesDestination(
-                    onBack = { navController.popBackStack() },
-                    onOpenQuestionnaire = { questionnaireId, title ->
-                        navController.navigate(QuestionnaireRunRoute.create(questionnaireId, title))
-                    },
-                )
-                questionnaireRunDestination(onExit = { navController.popBackStack() })
-                clubDestination()
-                historyDestination()
-                // Tabs whose feature does not exist yet.
-                TopLevelTab.entries
-                    .filter { it.route !in setOf(HomeRoute, ClubRoute, HistoryRoute) }
-                    .forEach { tab ->
-                        composable(tab.route.route) { ComingSoonScreen(title = stringResource(tab.labelRes)) }
-                    }
             }
+        },
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = HomeRoute.route,
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
+        ) {
+            homeDestination(
+                onOpenCategory = { categoryId, categoryName ->
+                    navController.navigate(QuestionnairesRoute.create(categoryId, categoryName))
+                },
+            )
+            questionnairesDestination(
+                onBack = { navController.popBackStack() },
+                onOpenQuestionnaire = { questionnaireId, title ->
+                    navController.navigate(QuestionnaireRunRoute.create(questionnaireId, title))
+                },
+            )
+            questionnaireRunDestination(onExit = { navController.popBackStack() })
+            clubDestination()
+            historyDestination()
+            profileDestination()
+            // Tabs whose feature does not exist yet.
+            TopLevelTab.entries
+                .filter { it.route !in setOf(HomeRoute, ClubRoute, HistoryRoute, ProfileRoute) }
+                .forEach { tab ->
+                    composable(tab.route.route) { ComingSoonScreen(title = stringResource(tab.labelRes)) }
+                }
         }
     }
 }

@@ -7,6 +7,10 @@ import com.alarysai.alarysai.core.common.content.ContentLoadException
 import com.alarysai.alarysai.core.common.language.Language
 import com.alarysai.alarysai.core.common.language.LanguageProvider
 import com.alarysai.alarysai.core.common.language.LocalizedText
+import com.alarysai.alarysai.core.common.session.SessionRepository
+import com.alarysai.alarysai.core.common.session.SessionUser
+import com.alarysai.alarysai.core.common.session.UserProfile
+import com.alarysai.alarysai.core.common.session.UserProfileRepository
 import com.alarysai.alarysai.core.testing.MainDispatcherRule
 import com.alarysai.alarysai.feature.home.domain.model.QuestionnaireCategory
 import com.alarysai.alarysai.feature.home.domain.repository.QuestionnaireCategoryRepository
@@ -17,6 +21,9 @@ import com.alarysai.alarysai.feature.home.presentation.state.CategoriesSection
 import com.alarysai.alarysai.feature.home.presentation.state.CategoryItemUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -53,8 +60,23 @@ class HomeViewModelTest {
     /** Buffered so tryEmit succeeds while the ViewModel is subscribed. */
     private fun updates() = MutableSharedFlow<ContentList<QuestionnaireCategory>>(extraBufferCapacity = 8)
 
-    private fun viewModel(repository: QuestionnaireCategoryRepository, language: Language = Language.PT) =
-        HomeViewModel(repository, FixedLanguage(language))
+    private class FakeSession(user: SessionUser?) : SessionRepository {
+        val user = MutableStateFlow(user)
+        override fun observeUser(): Flow<SessionUser?> = user
+        override fun observeUserId(): Flow<String?> = user.map { it?.uid }
+    }
+
+    private class FakeProfiles(private val profile: Flow<UserProfile?> = flowOf(null)) : UserProfileRepository {
+        override fun observeProfile(uid: String): Flow<UserProfile?> = profile
+        override suspend fun saveProfile(uid: String, displayName: String, language: Language, isNew: Boolean) = Unit
+    }
+
+    private fun viewModel(
+        repository: QuestionnaireCategoryRepository,
+        language: Language = Language.PT,
+        session: SessionRepository = FakeSession(null),
+        profiles: UserProfileRepository = FakeProfiles(),
+    ) = HomeViewModel(repository, FixedLanguage(language), session, profiles)
 
     private fun HomeViewModel.successCategories() =
         (uiState.value.categories as CategoriesSection.Success).categories
@@ -228,5 +250,27 @@ class HomeViewModelTest {
             viewModel.onAction(HomeUiAction.CategoryClicked(CategoryItemUi("img", "Image", null, 0)))
             assertEquals(HomeUiEvent.OpenCategory(categoryId = "img", categoryName = "Image"), awaitItem())
         }
+    }
+
+    @Test
+    fun `greets the signed-in user by the first name of the profile`() {
+        val session = FakeSession(SessionUser("u1", "marina@x.com", displayName = "Marina G."))
+        val viewModel = viewModel(
+            FakeRepository(updates()),
+            session = session,
+            profiles = FakeProfiles(flowOf(UserProfile("Marina Alves", null, Language.PT))),
+        )
+
+        assertEquals("Marina", viewModel.uiState.value.userName)
+
+        session.user.value = null
+        assertNull(viewModel.uiState.value.userName)
+    }
+
+    @Test
+    fun `without a profile yet the provider name is used`() {
+        val viewModel = viewModel(FakeRepository(updates()), session = FakeSession(SessionUser("u1", null, "Diego Souza")))
+
+        assertEquals("Diego", viewModel.uiState.value.userName)
     }
 }

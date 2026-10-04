@@ -36,6 +36,10 @@ dependencies {
 
     api(platform(libs.firebase.bom))
     api(libs.firebase.firestore)
+    // The BoM would raise it to 24.x (Kotlin 2.3 metadata); keep the pinned 23.x.
+    api(libs.firebase.auth) {
+        version { strictly(libs.versions.firebaseAuth.get()) }
+    }
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.play.services)
 

@@ -7,7 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.alarysai.alarysai.core.designsystem.theme.AlarysTheme
-import com.alarysai.alarysai.navigation.AlarysNavHost
+import com.alarysai.alarysai.root.AppRoot
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             AlarysTheme {
-                AlarysNavHost()
+                AppRoot()
             }
         }
     }

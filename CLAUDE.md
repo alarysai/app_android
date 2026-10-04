@@ -95,8 +95,9 @@ Add `core:network` or `core:database` only when a feature really needs them.
 - `feature:tips`
 - `feature:advertisers`
 - `feature:history`
+- `feature:auth`
 
-Planned (see `TASKS.md`): profile (sign-in).
+Planned (see `TASKS.md`): plans.
 
 ### Dependency rules
 - Presentation depends on Domain when needed.

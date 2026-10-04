@@ -17,6 +17,10 @@ App Android da alarysai. Mostra o conteúdo cadastrado no [painel web](https://w
 
 O AGP fica em 8.6.0 porque é a versão mais nova que o Android Studio Koala sincroniza. Ela limita `compileSdk`/`targetSdk` a 35. Suba os três juntos (ver `gradle/libs.versions.toml`).
 
+**Firebase Auth fixado em 23.2.1.** O `firebase-auth` 24.x do BoM 34 é compilado com metadados do Kotlin 2.3, que o Kotlin 2.0.20 não lê. O `core:firebase` declara `strictly(23.2.1)` para o BoM não subir a versão. Confirmado no aparelho que inicializa junto com o Firestore e o `firebase-common` 22.x. Ao atualizar a toolchain (Kotlin 2.3+), remova o `strictly` e volte a usar a versão do BoM.
+
+**Login com Google:** usa o cliente OAuth web do `google-services.json` (`default_web_client_id`) e precisa do SHA-1 da chave que assina o app cadastrado no app Android do Firebase. O SHA-1 de debug desta máquina já está cadastrado; o de release, não. O provedor Google precisa estar ativo em Authentication → Sign-in method.
+
 ### `google-services.json`
 
 Fica em `app/` e **é versionado**: contém só identificadores públicos. Para baixar de novo:
@@ -41,18 +45,19 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 
 | Módulo | Responsabilidade |
 | --- | --- |
-| `app` | `Application` (Hilt), `MainActivity`, `AlarysNavHost` (fundo da marca, barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `ComingSoonScreen` (abas sem feature ainda) |
-| `core:common` | `Language`, `LocalizedText` (fallback para PT), `LanguageProvider` (idioma do aparelho), `ContentList`, `ContentLoadError`/`ContentLoadException`, busca sem acento (`matchesSearch`), `SessionRepository` (quem está logado; hoje `SignedOutSessionRepository`) |
+| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `ComingSoonScreen` (abas sem feature ainda), `GoogleSignInModule` (cliente OAuth web) |
+| `core:common` | `Language`, `LocalizedText` (fallback para PT), `LanguageProvider` (idioma do perfil, senão o do aparelho) e `PreferredLanguageHolder`, `ContentList`, `ContentLoadError`/`ContentLoadException`, busca sem acento (`matchesSearch`), contratos de sessão (`SessionRepository`, `SessionUser`) e perfil (`UserProfileRepository`, `UserProfile`) |
 | `core:designsystem` | `AlarysTheme` (escuro, paleta do mockup), `AlarysBackground` (fundo com brilho azul/roxo), `GlassCard`, `AlarysLogo` (provisório, desenhado em código), `AlarysBottomBar` |
 | `core:ui` | Estados de tela reutilizáveis (`LoadingContent`, `MessageContent`, `ContentLoadErrorContent`, `OfflineNotice`) e entrada por voz (`rememberSpeechInput`) |
 | `core:navigation` | Contratos de rota (`AppRoute`): abas `home`, `history`, `plans`, `club`, `profile`, `questionnaires/{categoryId}?categoryName=` e `questionnaire/{questionnaireId}?title=` |
-| `core:firebase` | Instância do Firestore (Hilt), `FirestoreContract` (campos e status), DTOs comuns (`LocalizedTextDto`, `ImageRefDto`), leitura defensiva em tempo real (`observeDocuments`) e única (`getRemoteDocumentOrNull`, `getRemoteDocuments`), documento em tempo real (`observeRemoteDocument`), exclusão (`deleteDocument`), `Throwable.toContentLoadError()` |
+| `core:firebase` | Instância do Firestore (Hilt), `FirestoreContract` (campos e status), DTOs comuns (`LocalizedTextDto`, `ImageRefDto`), leitura defensiva em tempo real (`observeDocuments`) e única (`getRemoteDocumentOrNull`, `getRemoteDocuments`), documento em tempo real (`observeRemoteDocument`), exclusão (`deleteDocument`), `Throwable.toContentLoadError()`, sessão do Firebase Auth (`FirebaseSessionRepository`) e perfil em `users/{uid}` (`FirestoreUserProfileRepository`) |
 | `core:testing` | `MainDispatcherRule`, JUnit, coroutines-test, MockK, Turbine |
 | `feature:home` | Tela Início: cabeçalho, busca, saudação, uso do plano, categorias de questionário (Firestore) e chat |
 | `feature:questionnaires` | Questionários publicados de uma categoria e a execução de um questionário (passos e fluxo) |
 | `feature:tips` | Dicas com filtro por categoria (aba Club AI) |
 | `feature:advertisers` | Anunciantes agrupados por tipo, link em Custom Tab (aba Club AI) |
 | `feature:history` | Aba Histórico: saldo de créditos, gerações e extrato do usuário logado |
+| `feature:auth` | Login (e-mail/senha e Google), cadastro, recuperação de senha, primeiro acesso e aba Perfil |
 
 ### Como uma tela de conteúdo lê o Firestore
 
@@ -97,7 +102,7 @@ Segue o mockup da tela principal. Cada seção vem de um campo do `HomeUiState`:
 | --- | --- | --- |
 | Cabeçalho (logo + sino) | — | Logo provisório desenhado em código. O sino mostra "As notificações chegam em breve." (sem ponto de não lido: não há notificações) |
 | Busca "Buscar recursos" | local | Filtra as categorias pelo nome, sem diferenciar maiúsculas nem acentos. O microfone preenche a busca por voz e some se o aparelho não tiver reconhecedor |
-| Saudação | `userName` (sempre `null`, não há login) | "Olá!" sem nome; "Olá, Diego" quando houver usuário |
+| Saudação | primeiro nome do perfil (`users/{uid}.displayName`) ou do provedor | "Olá, Marina"; "Olá!" sem nome |
 | Uso do seu plano | `planUsage` (sempre `null`, não há serviço de créditos) | Sem dados: explica que os créditos aparecem ao entrar. Com dados: barra de uso, % usado/disponível e créditos. "Adquirir créditos" avisa que chega em breve |
 | Categorias | Firestore `questionnaireCategories` (ativas, por `order`, em tempo real) | Linhas de 3 cards; a última linha estica (5 categorias = 3 + 2). Cor do card pela posição na lista completa. Sem ícone, mostra a inicial. Estados: carregando, lista, sem resultado na busca, vazio, erro com "Tentar de novo", faixa de offline. Tocar abre os questionários da categoria |
 | Converse com a Alarys | local | Guarda o texto digitado; enviar uma mensagem não vazia avisa que o chat chega em breve. Microfone dita a mensagem |
@@ -184,7 +189,7 @@ Título "Club AI" e duas abas no topo: **Dicas** (padrão) e **Anunciantes**. A 
 ### Histórico e créditos (`feature:history`, aba Histórico)
 
 - **Depende de login.** `users/{uid}` e as subcoleções só podem ser lidos pelo dono. A tela segue o `SessionRepository`: sem ninguém logado, mostra "Entre na sua conta" e não faz consulta nenhuma. Ao entrar, começa a ler; ao sair, para.
-- **Ainda não há login** (Task 9). A implementação ligada hoje é `SignedOutSessionRepository` (`core:common/di/SessionModule`), que sempre informa "ninguém logado". Por isso, no aparelho, a aba só mostra o convite para entrar. A Task 9 troca esse binding por uma sessão do Firebase Auth, e a aba passa a funcionar sem outras mudanças.
+- A sessão vem do Firebase Auth (`FirebaseSessionRepository`, Task 9). Como o login é obrigatório, o convite para entrar só aparece se a sessão cair com a aba aberta.
 - **Saldo:** `users/{uid}.creditBalance` em tempo real. Documento ou campo ausente (nunca creditado) e valores negativos contam como 0. Se a leitura falhar, o saldo aparece como "—".
 - **Gerações** (`users/{uid}/history`, por `createdAt` decrescente, índice automático): título copiado no idioma usado (sem título: "Questionário"), tipo de saída, data, créditos gastos, prévia do texto (4 linhas) e "Abrir resultado" quando há link `https://`. `answers` e `prompt` não são mostrados.
 - **Apagar:** o dono pode apagar itens do próprio histórico (única gravação permitida). Pede confirmação ("Os créditos usados não voltam"). A consulta em tempo real tira o item da lista sozinha; se falhar, aparece "Não foi possível apagar".
@@ -193,9 +198,49 @@ Título "Club AI" e duas abas no topo: **Dicas** (padrão) e **Anunciantes**. A 
 - Estados por aba: carregando, lista, vazio, erro com "Tentar de novo" e faixa de offline.
 - O card "Uso do seu plano" da Início ainda não usa o saldo: ele precisa da franquia do plano para calcular a porcentagem, e esse dado ainda não existe no schema.
 
+### Login e perfil (`feature:auth`)
+
+**O login é obrigatório.** O `AppRoot` mostra uma de três coisas, conforme `ObserveAuthGateUseCase`:
+
+| Situação | Tela |
+| --- | --- |
+| Ninguém logado | `AuthFlow`: login, cadastro e recuperação de senha |
+| Logado, sem `users/{uid}` (primeiro acesso) | "Seu perfil foi criado": nome e idioma |
+| Logado, com perfil | o app (Início, abas…) |
+
+Se o perfil não puder ser lido (ex.: sem rede num aparelho novo), o app abre com os dados do provedor em vez de travar o usuário.
+
+- **Login ("Bem-vindo de volta"):**
+  - e-mail e senha, com o olho para mostrar a senha;
+  - "Manter conectado": salvo localmente. Se desmarcado, a sessão é encerrada na próxima abertura do app (`ApplyKeepSignedInUseCase`);
+  - "Esqueci a senha", "Continuar com Google" (Credential Manager) e "Criar conta";
+  - o login com Apple não existe, por decisão do produto;
+  - erros: e-mail inválido, "E-mail ou senha incorretos" (o Firebase não diz qual dos dois), sem rede, muitas tentativas e Google indisponível neste aparelho. Fechar o seletor de contas do Google não mostra erro.
+- **Cadastro ("Criar conta"):**
+  - nome, e-mail, senha (mínimo de **8** caracteres) e confirmação;
+  - aceite da Política de Privacidade e dos Termos de Uso (LGPD), obrigatório;
+  - o botão fica cinza até tudo estar preenchido e o aceite marcado;
+  - os erros de campo aparecem depois da primeira tentativa e somem enquanto o usuário corrige;
+  - o nome vai para o perfil do Firebase Auth e preenche a tela de primeiro acesso;
+  - o **opt-in de novidades** do mockup ficou de fora, porque as regras de `users/{uid}` não permitem guardá-lo. O aceite também ainda não é registrado no banco, e os textos aparecem **sem link** até a política e os termos terem URL. Proposta: [docs/proposta-usuarios-login.md](docs/proposta-usuarios-login.md).
+- **Recuperar senha:**
+  - envia o link do Firebase no idioma do usuário;
+  - a confirmação ("Verifique seu e-mail") **nunca diz se a conta existe** ("Se existir uma conta para…");
+  - "Abrir app de e-mail", "Reenviar" com espera de **30 s** e "Voltar ao login".
+- **Primeiro acesso ("Seu perfil foi criado"):**
+  - mostra o e-mail confirmado, as iniciais, o nome (vindo do cadastro ou do Google) e o idioma (Português (Brasil), English, Español);
+  - "Começar" cria `users/{uid}` só com `displayName`, `photoUrl` (null), `language`, `createdAt` e `updatedAt`, que são os campos permitidos pelas regras;
+  - "Adicionar foto" fica de fora até o Storage existir.
+- **Aba Perfil:**
+  - a mesma tela, em modo edição: salvar atualiza `displayName`, `language` e `updatedAt`;
+  - tem o botão "Sair da conta".
+- **Idioma do perfil:** passa a valer para os **conteúdos** (`LocalizedText`) no lugar do idioma do aparelho (`PreferredLanguageHolder`). Os textos fixos do app continuam no idioma do aparelho.
+- **Saudação da Início:** "Olá, <primeiro nome>", vindo do perfil (ou do provedor enquanto o perfil carrega).
+- **Histórico e créditos:** com login, a aba Histórico passa a ler os dados do usuário. Eles ficam vazios até o serviço de geração existir.
+
 ### Navegação principal
 
-Barra inferior com Início, Histórico, Planos, Club AI e Perfil (`TopLevelTab`). A troca de aba mantém uma cópia de cada tela e restaura o estado. Início, Histórico e Club AI (Dicas e Anunciantes) têm conteúdo; Planos e Perfil mostram "Em breve por aqui.". Telas abertas a partir de uma aba (como os questionários) mantêm a aba Início marcada.
+Barra inferior com Início, Histórico, Planos, Club AI e Perfil (`TopLevelTab`). A troca de aba mantém uma cópia de cada tela e restaura o estado. Início, Histórico, Club AI (Dicas e Anunciantes) e Perfil têm conteúdo; Planos mostra "Em breve por aqui.". Telas abertas a partir de uma aba (como os questionários) mantêm a aba Início marcada.
 
 O tema é escuro sempre (a marca é escura), com ícones claros nas barras do sistema.
 
@@ -214,9 +259,19 @@ O tema é escuro sempre (a marca é escura), com ícones claros nas barras do si
 | `QuestionnaireCategoryMapperTest` | status ativo/inativo/desconhecido, sem nome, ícone, `order` fora do intervalo |
 | `QuestionnaireCategoryRepositoryImplTest` | ordenação (order + ID), descarte de inválidos, flag de cache, erro do Firestore |
 | `SearchTextTest` | normalização (acento, caixa, espaços), busca vazia |
-| `HomeViewModelTest` | loading, idioma e fallback, cor estável, offline, vazio, busca (sem acento, sem resultado, antes da lista chegar, com atualização ao vivo), erros, retry, chat, avisos de "em breve", abrir categoria |
+| `HomeViewModelTest` | loading, idioma e fallback, cor estável, offline, vazio, busca (sem acento, sem resultado, antes da lista chegar, com atualização ao vivo), erros, retry, chat, avisos de "em breve", abrir categoria, saudação com o primeiro nome |
 | `HomeScreenTest` (androidTest) | saudação com e sem nome, créditos com e sem dados, cards, busca, sem resultado, "Tentar de novo", enviar no chat, tocar numa categoria |
-| `SignedOutSessionRepositoryTest` | ninguém logado enquanto não há login |
+| `DeviceLanguageProviderTest` | idioma do aparelho, idioma do perfil tem prioridade |
+| `UserProfileMapperTest` | campos do perfil, nome vazio, foto insegura e idioma desconhecido |
+| `ValidationTest` (auth) | e-mail, formulário completo, todos os erros, tamanho mínimo da senha |
+| `SessionUseCasesTest` | login → primeiro acesso → app → saída, perfil ilegível abre o app, "Manter conectado" |
+| `AuthErrorMapperTest` | exceções do Firebase Auth → `AuthError` |
+| `LoginViewModelTest` | preferência salva, login, e-mail inválido, credenciais erradas, Google (token, cancelado, erro), eventos |
+| `SignUpViewModelTest` | botão habilitado, criação, erros após a tentativa, e-mail em uso, voltar |
+| `ForgotPasswordViewModelTest` | envio, confirmação e contagem de 30 s, e-mail inválido, erro, eventos |
+| `ProfileViewModelTest` | primeiro acesso com nome do provedor, criação com idioma, nome vazio, edição sem sobrescrever o que foi digitado, falha ao salvar, sair |
+| `AppRootViewModelTest` | sessão mantida abre o app no idioma do perfil, sessão não mantida é encerrada antes, saída limpa o idioma, primeiro acesso |
+| `AuthScreensTest` (androidTest) | login, botão desabilitado, erros do cadastro e aceite, confirmação da recuperação, primeiro acesso |
 | `HistoryMappersTest` | geração, valores estranhos viram neutros, todos os tipos de saída, transação e motivos, saldo ausente/negativo = 0 |
 | `UserActivityRepositoriesTest` | histórico mais recente primeiro (pendente no topo), apagar e erro, saldo com documento ausente e sem repetições, extrato e erro |
 | `HistoryViewModelTest` | sem login não consulta, com login mostra saldo/gerações/extrato, vazio e erro por aba, troca de aba, confirmar/cancelar/falhar ao apagar, abrir resultado, sair da conta, retry |

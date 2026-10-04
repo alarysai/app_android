@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.alarysai.alarysai.core.common.content.ContentList
 import com.alarysai.alarysai.core.common.content.toContentLoadErrorOrUnknown
 import com.alarysai.alarysai.core.common.language.LanguageProvider
+import com.alarysai.alarysai.core.common.session.SessionRepository
+import com.alarysai.alarysai.core.common.session.UserProfileRepository
 import com.alarysai.alarysai.core.common.text.matchesSearch
 import com.alarysai.alarysai.feature.home.domain.model.QuestionnaireCategory
 import com.alarysai.alarysai.feature.home.domain.repository.QuestionnaireCategoryRepository
@@ -15,6 +17,7 @@ import com.alarysai.alarysai.feature.home.presentation.state.CategoriesSection
 import com.alarysai.alarysai.feature.home.presentation.state.CategoryItemUi
 import com.alarysai.alarysai.feature.home.presentation.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,6 +27,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -33,6 +39,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val categoryRepository: QuestionnaireCategoryRepository,
     private val languageProvider: LanguageProvider,
+    private val sessionRepository: SessionRepository,
+    private val profileRepository: UserProfileRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -50,6 +58,24 @@ class HomeViewModel @Inject constructor(
 
     init {
         observeCategories()
+        observeUserName()
+    }
+
+    /** "Olá, Marina": the profile name, or the sign-in provider name while the profile loads. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeUserName() {
+        sessionRepository.observeUser()
+            .flatMapLatest { user ->
+                if (user == null) {
+                    flowOf(null)
+                } else {
+                    profileRepository.observeProfile(user.uid)
+                        .map { profile -> profile?.displayName ?: user.displayName }
+                        .catch { emit(user.displayName) }
+                }
+            }
+            .onEach { name -> _uiState.update { it.copy(userName = name?.substringBefore(' ')?.takeIf { first -> first.isNotBlank() }) } }
+            .launchIn(viewModelScope)
     }
 
     fun onAction(action: HomeUiAction) {
