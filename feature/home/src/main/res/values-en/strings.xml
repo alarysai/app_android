@@ -18,7 +18,7 @@
     </plurals>
     <string name="home_plan_credits_label">available</string>
     <string name="home_plan_buy">Buy credits</string>
-    <string name="home_plan_unavailable">Your credits show up here once you sign in.</string>
+    <string name="home_plan_unavailable">Your credits show up here once your plan is active.</string>
 
     <string name="home_categories_empty_title">No categories yet</string>
     <string name="home_categories_empty_body">New categories show up here as soon as they\'re published.</string>

@@ -43,11 +43,11 @@ class HomeScreenTest {
     }
 
     @Test
-    fun showsGreetingWithoutNameAndExplainsCreditsWhenSignedOut() {
+    fun showsGreetingWithoutNameAndExplainsCreditsWithoutPlan() {
         setScreen(HomeUiState(categories = categories))
 
         composeRule.onNodeWithText("Olá!").assertIsDisplayed()
-        composeRule.onNodeWithText("Seus créditos aparecem aqui quando você entrar na sua conta.").assertIsDisplayed()
+        composeRule.onNodeWithText("Seus créditos aparecem aqui quando o seu plano estiver ativo.").assertIsDisplayed()
     }
 
     @Test

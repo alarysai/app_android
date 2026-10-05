@@ -37,7 +37,7 @@ import com.alarysai.alarysai.core.designsystem.theme.Cyan400
 import com.alarysai.alarysai.feature.home.R
 import com.alarysai.alarysai.feature.home.presentation.state.PlanUsageUi
 
-/** Monthly credit usage. With [usage] null (no credits service yet) it explains where credits will show up. */
+/** Monthly credit usage. With [usage] null (no active plan data from the server yet) it explains where credits will show up. */
 @Composable
 fun PlanUsageCard(
     usage: PlanUsageUi?,

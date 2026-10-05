@@ -18,7 +18,7 @@
     </plurals>
     <string name="home_plan_credits_label">disponibles</string>
     <string name="home_plan_buy">Comprar créditos</string>
-    <string name="home_plan_unavailable">Tus créditos aparecerán aquí cuando inicies sesión.</string>
+    <string name="home_plan_unavailable">Tus créditos aparecerán aquí cuando tu plan esté activo.</string>
 
     <string name="home_categories_empty_title">Aún no hay categorías</string>
     <string name="home_categories_empty_body">Las nuevas categorías aparecen aquí en cuanto se publican.</string>
