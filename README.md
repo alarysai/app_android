@@ -45,7 +45,7 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 
 | Módulo | Responsabilidade |
 | --- | --- |
-| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `ComingSoonScreen` (abas sem feature ainda), `GoogleSignInModule` (cliente OAuth web) |
+| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `GoogleSignInModule` (cliente OAuth web) |
 | `core:common` | `Language`, `LocalizedText` (fallback para PT), `LanguageProvider` (idioma do perfil, senão o do aparelho) e `PreferredLanguageHolder`, `ContentList`, `ContentLoadError`/`ContentLoadException`, busca sem acento (`matchesSearch`), contratos de sessão (`SessionRepository`, `SessionUser`) e perfil (`UserProfileRepository`, `UserProfile`) |
 | `core:designsystem` | `AlarysTheme` (escuro, paleta do mockup), `AlarysBackground` (fundo com brilho azul/roxo), `GlassCard`, `AlarysLogo` (provisório, desenhado em código), `AlarysBottomBar` |
 | `core:ui` | Estados de tela reutilizáveis (`LoadingContent`, `MessageContent`, `ContentLoadErrorContent`, `OfflineNotice`) e entrada por voz (`rememberSpeechInput`) |
@@ -58,6 +58,7 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 | `feature:advertisers` | Anunciantes agrupados por tipo, link em Custom Tab (aba Club AI) |
 | `feature:history` | Aba Histórico: saldo de créditos, gerações e extrato do usuário logado |
 | `feature:auth` | Login (e-mail/senha e Google), cadastro, recuperação de senha, primeiro acesso e aba Perfil |
+| `feature:plans` | Aba Planos: assinaturas e pacotes de créditos pela Google Play (Play Billing 7) |
 
 ### Como uma tela de conteúdo lê o Firestore
 
@@ -103,7 +104,7 @@ Segue o mockup da tela principal. Cada seção vem de um campo do `HomeUiState`:
 | Cabeçalho (logo + sino) | — | Logo provisório desenhado em código. O sino mostra "As notificações chegam em breve." (sem ponto de não lido: não há notificações) |
 | Busca "Buscar recursos" | local | Filtra as categorias pelo nome, sem diferenciar maiúsculas nem acentos. O microfone preenche a busca por voz e some se o aparelho não tiver reconhecedor |
 | Saudação | primeiro nome do perfil (`users/{uid}.displayName`) ou do provedor | "Olá, Marina"; "Olá!" sem nome |
-| Uso do seu plano | `planUsage` (sempre `null`, não há serviço de créditos) | Sem dados: explica que os créditos aparecem ao entrar. Com dados: barra de uso, % usado/disponível e créditos. "Adquirir créditos" avisa que chega em breve |
+| Uso do seu plano | `planUsage` (sempre `null`: falta a franquia do plano no servidor) | Sem dados: explica onde os créditos aparecem. Com dados: barra de uso, % usado/disponível e créditos. "Adquirir créditos" abre a aba Planos |
 | Categorias | Firestore `questionnaireCategories` (ativas, por `order`, em tempo real) | Linhas de 3 cards; a última linha estica (5 categorias = 3 + 2). Cor do card pela posição na lista completa. Sem ícone, mostra a inicial. Estados: carregando, lista, sem resultado na busca, vazio, erro com "Tentar de novo", faixa de offline. Tocar abre os questionários da categoria |
 | Converse com a Alarys | local | Guarda o texto digitado; enviar uma mensagem não vazia avisa que o chat chega em breve. Microfone dita a mensagem |
 
@@ -238,9 +239,34 @@ Se o perfil não puder ser lido (ex.: sem rede num aparelho novo), o app abre co
 - **Saudação da Início:** "Olá, <primeiro nome>", vindo do perfil (ou do provedor enquanto o perfil carrega).
 - **Histórico e créditos:** com login, a aba Histórico passa a ler os dados do usuário. Eles ficam vazios até o serviço de geração existir.
 
+### Planos e créditos (`feature:plans`, aba Planos)
+
+Vende pela **Google Play** (Play Billing 7.1.1) **assinaturas** (planos mensais com créditos) e **pacotes avulsos de créditos**. Configuração do Play Console, servidor e próximos passos: [docs/proposta-pagamentos-play.md](docs/proposta-pagamentos-play.md).
+
+- **Catálogo:** os IDs ficam em `BillingCatalog` (`alarys_plano_basico`, `alarys_plano_pro`, `alarys_creditos_50`, `alarys_creditos_200`). Nome, descrição e preço vêm do Play Console, já traduzidos e na moeda do usuário. ID inexistente ou inativo simplesmente não aparece.
+- **Tela:**
+  - "Assinaturas": nome, descrição e preço recorrente do plano base ("R$ 19,90 por mês"), com o selo "Seu plano" na assinatura ativa;
+  - "Pacotes de créditos";
+  - nota de renovação automática e link para gerenciar assinaturas na Google Play.
+- **Estados:**
+  - carregando;
+  - "Google Play indisponível": sem Play Store, ou o app não foi instalado por ela;
+  - "Planos em breve": nenhum produto ativo;
+  - erro com "Tentar de novo".
+- **Compra:**
+  - abre a folha de pagamento da Play com `obfuscatedAccountId = sha256(uid)`, para o servidor ligar a compra à conta;
+  - o resultado passa por `ProcessPurchaseUseCase`: pagamento pendente espera, compra já confirmada conta como entregue, e o resto vai ao **servidor** (`PurchaseVerifier`).
+- **O app nunca dá créditos nem confirma compras.**
+  - Hoje o verificador é `ServerlessPurchaseVerifier` ("servidor indisponível"). A compra fica sem confirmação e a Google estorna em 3 dias.
+  - O usuário vê: "Compra recebida, mas a liberação de créditos ainda não está ativa…".
+  - Ao abrir a aba, compras sem entrega são reenviadas ao servidor sem aviso.
+- **Habilitado só no debug:** `PURCHASES_ENABLED` é `true` no build de debug (contas de teste da Play) e `false` no release. No release, os botões mostram "Em breve", até o servidor existir.
+- **Botão "Adquirir créditos" da Início:** abre a aba Planos.
+- **Para testar:** o app precisa estar instalado **pela Play Store** (faixa de teste interno), com uma conta de teste de licença. Instalado pelo Android Studio, a Play não responde com os produtos.
+
 ### Navegação principal
 
-Barra inferior com Início, Histórico, Planos, Club AI e Perfil (`TopLevelTab`). A troca de aba mantém uma cópia de cada tela e restaura o estado. Início, Histórico, Club AI (Dicas e Anunciantes) e Perfil têm conteúdo; Planos mostra "Em breve por aqui.". Telas abertas a partir de uma aba (como os questionários) mantêm a aba Início marcada.
+Barra inferior com Início, Histórico, Planos, Club AI e Perfil (`TopLevelTab`). A troca de aba mantém uma cópia de cada tela e restaura o estado. Todas as abas têm conteúdo: Início, Histórico, Planos, Club AI (Dicas e Anunciantes) e Perfil. Telas abertas a partir de uma aba (como os questionários) mantêm a aba Início marcada.
 
 O tema é escuro sempre (a marca é escura), com ícones claros nas barras do sistema.
 
@@ -259,7 +285,7 @@ O tema é escuro sempre (a marca é escura), com ícones claros nas barras do si
 | `QuestionnaireCategoryMapperTest` | status ativo/inativo/desconhecido, sem nome, ícone, `order` fora do intervalo |
 | `QuestionnaireCategoryRepositoryImplTest` | ordenação (order + ID), descarte de inválidos, flag de cache, erro do Firestore |
 | `SearchTextTest` | normalização (acento, caixa, espaços), busca vazia |
-| `HomeViewModelTest` | loading, idioma e fallback, cor estável, offline, vazio, busca (sem acento, sem resultado, antes da lista chegar, com atualização ao vivo), erros, retry, chat, avisos de "em breve", abrir categoria, saudação com o primeiro nome |
+| `HomeViewModelTest` | loading, idioma e fallback, cor estável, offline, vazio, busca (sem acento, sem resultado, antes da lista chegar, com atualização ao vivo), erros, retry, chat, aviso de "em breve" nas notificações, "Adquirir créditos" abre Planos, abrir categoria, saudação com o primeiro nome |
 | `HomeScreenTest` (androidTest) | saudação com e sem nome, créditos com e sem dados, cards, busca, sem resultado, "Tentar de novo", enviar no chat, tocar numa categoria |
 | `DeviceLanguageProviderTest` | idioma do aparelho, idioma do perfil tem prioridade |
 | `UserProfileMapperTest` | campos do perfil, nome vazio, foto insegura e idioma desconhecido |
@@ -276,6 +302,9 @@ O tema é escuro sempre (a marca é escura), com ícones claros nas barras do si
 | `UserActivityRepositoriesTest` | histórico mais recente primeiro (pendente no topo), apagar e erro, saldo com documento ausente e sem repetições, extrato e erro |
 | `HistoryViewModelTest` | sem login não consulta, com login mostra saldo/gerações/extrato, vazio e erro por aba, troca de aba, confirmar/cancelar/falhar ao apagar, abrir resultado, sair da conta, retry |
 | `HistoryScreenTest` (androidTest) | convite para entrar, saldo e geração com ações, diálogo de apagar, extrato com sinal e troca de aba |
+| `BillingDomainTest` | períodos da Play (P1M…), códigos do Play Billing → `BillingError`, compra nova vai ao servidor, pendente e já entregue não vão |
+| `PlansViewModelTest` | planos e pacotes com "Seu plano", vazio/sem Play/erro, retry, abrir compra com oferta, release sem compra, compra aguardando servidor, assinatura entregue vira plano atual, pendente/falha/erro ao abrir, reenvio do que não foi entregue, gerenciar assinaturas |
+| `PlansScreenTest` (androidTest) | preços, "Seu plano", assinar e comprar, aviso de "em breve" no release |
 | `AdvertiserMapperTest` | ativo/inativo, `type` arrumado, só `https://`, nome ou imagem |
 | `GroupAdvertisersByTypeUseCaseTest` | mesmo tipo sem caixa/acento/espaço com a primeira grafia, ordem alfabética pt, ordem interna, sem tipo no fim, lista vazia |
 | `AdvertiserRepositoryImplTest` | ordenação, descarte de inativos e links inseguros, cache, erro do Firestore |

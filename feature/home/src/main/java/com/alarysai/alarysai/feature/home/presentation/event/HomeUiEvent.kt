@@ -6,10 +6,12 @@ sealed interface HomeUiEvent {
 
     /** Opens the questionnaires of a category; the name becomes the next screen's title. */
     data class OpenCategory(val categoryId: String, val categoryName: String) : HomeUiEvent
+
+    /** "Buy credits" opens the Plans tab. */
+    data object OpenPlans : HomeUiEvent
 }
 
 enum class ComingSoonFeature {
     CHAT,
     NOTIFICATIONS,
-    CREDITS,
 }

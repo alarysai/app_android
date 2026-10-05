@@ -4,8 +4,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.alarysai.alarysai.core.navigation.HomeRoute
 
-fun NavGraphBuilder.homeDestination(onOpenCategory: (categoryId: String, categoryName: String) -> Unit) {
+fun NavGraphBuilder.homeDestination(
+    onOpenCategory: (categoryId: String, categoryName: String) -> Unit,
+    onOpenPlans: () -> Unit,
+) {
     composable(route = HomeRoute.route) {
-        HomeScreenRoute(onOpenCategory = onOpenCategory)
+        HomeScreenRoute(onOpenCategory = onOpenCategory, onOpenPlans = onOpenPlans)
     }
 }

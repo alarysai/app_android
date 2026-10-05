@@ -11,19 +11,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.alarysai.alarysai.core.designsystem.component.AlarysBottomBar
 import com.alarysai.alarysai.core.designsystem.component.BottomBarItem
-import com.alarysai.alarysai.core.navigation.ClubRoute
-import com.alarysai.alarysai.core.navigation.HistoryRoute
-import com.alarysai.alarysai.core.navigation.ProfileRoute
 import com.alarysai.alarysai.core.navigation.HomeRoute
+import com.alarysai.alarysai.core.navigation.PlansRoute
 import com.alarysai.alarysai.core.navigation.QuestionnaireRunRoute
 import com.alarysai.alarysai.core.navigation.QuestionnairesRoute
 import com.alarysai.alarysai.feature.auth.presentation.profile.profileDestination
 import com.alarysai.alarysai.feature.history.presentation.screen.historyDestination
+import com.alarysai.alarysai.feature.plans.presentation.plansDestination
 import com.alarysai.alarysai.feature.home.presentation.screen.homeDestination
 import com.alarysai.alarysai.feature.questionnaires.presentation.run.screen.questionnaireRunDestination
 import com.alarysai.alarysai.feature.questionnaires.presentation.screen.questionnairesDestination
@@ -65,6 +63,7 @@ fun AlarysNavHost() {
                 onOpenCategory = { categoryId, categoryName ->
                     navController.navigate(QuestionnairesRoute.create(categoryId, categoryName))
                 },
+                onOpenPlans = { navController.navigateToTab(PlansRoute.route) },
             )
             questionnairesDestination(
                 onBack = { navController.popBackStack() },
@@ -76,12 +75,7 @@ fun AlarysNavHost() {
             clubDestination()
             historyDestination()
             profileDestination()
-            // Tabs whose feature does not exist yet.
-            TopLevelTab.entries
-                .filter { it.route !in setOf(HomeRoute, ClubRoute, HistoryRoute, ProfileRoute) }
-                .forEach { tab ->
-                    composable(tab.route.route) { ComingSoonScreen(title = stringResource(tab.labelRes)) }
-                }
+            plansDestination()
         }
     }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="plans_title">Planes</string>
+    <string name="plans_subscriptions">Suscripciones</string>
+    <string name="plans_credit_packs">Paquetes de créditos</string>
+    <string name="plans_subscribe">Suscribirme</string>
+    <string name="plans_buy">Comprar</string>
+    <string name="plans_coming_soon">Próximamente</string>
+    <string name="plans_current">Tu plan</string>
+    <string name="plans_price_week">%1$s por semana</string>
+    <string name="plans_price_month">%1$s por mes</string>
+    <string name="plans_price_quarter">%1$s cada 3 meses</string>
+    <string name="plans_price_semester">%1$s cada 6 meses</string>
+    <string name="plans_price_year">%1$s por año</string>
+    <string name="plans_price_other">%1$s</string>
+    <string name="plans_coming_soon_notice">Las compras en la app llegarán pronto. Por ahora, mira los planes disponibles.</string>
+    <string name="plans_renewal_note">Las suscripciones se renuevan automáticamente por Google Play. Puedes cancelar cuando quieras.</string>
+    <string name="plans_manage_subscriptions">Gestionar suscripciones en Google Play</string>
+    <string name="plans_store_unavailable_title">Google Play no disponible</string>
+    <string name="plans_store_unavailable_body">Para ver y suscribirte a los planes, usa un dispositivo con Play Store y la app instalada desde ella.</string>
+    <string name="plans_empty_title">Planes próximamente</string>
+    <string name="plans_empty_body">Los planes y paquetes de créditos aparecen aquí en cuanto se publiquen.</string>
+    <string name="plans_message_delivered">Compra confirmada. ¡Disfrútala!</string>
+    <string name="plans_message_pending">Pago pendiente. Lo liberamos en cuanto se confirme.</string>
+    <string name="plans_message_awaiting_server">Compra recibida, pero la entrega de créditos aún no está activa. Si no se entrega, Google Play te reembolsa en hasta 3 días.</string>
+    <string name="plans_message_rejected">No pudimos validar la compra. Contacta al soporte.</string>
+    <string name="plans_message_already_owned">Ya tienes este plan.</string>
+    <string name="plans_message_store_unavailable">Google Play no está disponible en este dispositivo.</string>
+    <string name="plans_message_network">Sin conexión. Inténtalo de nuevo.</string>
+    <string name="plans_message_unknown">No se pudo completar la compra. Inténtalo de nuevo.</string>
+</resources>

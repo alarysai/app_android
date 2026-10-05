@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="plans_title">Plans</string>
+    <string name="plans_subscriptions">Subscriptions</string>
+    <string name="plans_credit_packs">Credit packs</string>
+    <string name="plans_subscribe">Subscribe</string>
+    <string name="plans_buy">Buy</string>
+    <string name="plans_coming_soon">Coming soon</string>
+    <string name="plans_current">Your plan</string>
+    <string name="plans_price_week">%1$s per week</string>
+    <string name="plans_price_month">%1$s per month</string>
+    <string name="plans_price_quarter">%1$s every 3 months</string>
+    <string name="plans_price_semester">%1$s every 6 months</string>
+    <string name="plans_price_year">%1$s per year</string>
+    <string name="plans_price_other">%1$s</string>
+    <string name="plans_coming_soon_notice">In-app purchases are coming soon. For now, take a look at the plans.</string>
+    <string name="plans_renewal_note">Subscriptions renew automatically through Google Play. You can cancel at any time.</string>
+    <string name="plans_manage_subscriptions">Manage subscriptions on Google Play</string>
+    <string name="plans_store_unavailable_title">Google Play unavailable</string>
+    <string name="plans_store_unavailable_body">To see and subscribe to the plans, use a device with the Play Store and the app installed from it.</string>
+    <string name="plans_empty_title">Plans coming soon</string>
+    <string name="plans_empty_body">Plans and credit packs show up here as soon as they\'re published.</string>
+    <string name="plans_message_delivered">Purchase confirmed. Enjoy!</string>
+    <string name="plans_message_pending">Payment pending. We\'ll unlock it as soon as it clears.</string>
+    <string name="plans_message_awaiting_server">Purchase received, but credit delivery isn\'t active yet. If it isn\'t delivered, Google Play refunds you within 3 days.</string>
+    <string name="plans_message_rejected">We couldn\'t validate the purchase. Please contact support.</string>
+    <string name="plans_message_already_owned">You already have this plan.</string>
+    <string name="plans_message_store_unavailable">Google Play is unavailable on this device.</string>
+    <string name="plans_message_network">No connection. Please try again.</string>
+    <string name="plans_message_unknown">Couldn\'t complete the purchase. Please try again.</string>
+</resources>

@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":feature:advertisers"))
     implementation(project(":feature:history"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:plans"))
 
     implementation(platform(libs.compose.bom))
 

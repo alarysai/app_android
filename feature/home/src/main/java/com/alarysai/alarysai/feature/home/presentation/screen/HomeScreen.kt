@@ -53,6 +53,7 @@ const val CATEGORIES_LOADING_TAG = "categories_loading"
 @Composable
 fun HomeScreenRoute(
     onOpenCategory: (categoryId: String, categoryName: String) -> Unit,
+    onOpenPlans: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,6 +65,7 @@ fun HomeScreenRoute(
                 is HomeUiEvent.ShowComingSoon ->
                     snackbarHostState.showSnackbar(context.getString(event.feature.messageRes()))
                 is HomeUiEvent.OpenCategory -> onOpenCategory(event.categoryId, event.categoryName)
+                HomeUiEvent.OpenPlans -> onOpenPlans()
             }
         }
     }
@@ -151,7 +153,6 @@ private fun CategoriesSectionContent(
 private fun ComingSoonFeature.messageRes(): Int = when (this) {
     ComingSoonFeature.CHAT -> R.string.home_coming_soon_chat
     ComingSoonFeature.NOTIFICATIONS -> R.string.home_coming_soon_notifications
-    ComingSoonFeature.CREDITS -> R.string.home_coming_soon_credits
 }
 
 @Preview(heightDp = 900)

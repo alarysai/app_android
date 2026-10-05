@@ -230,7 +230,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `notifications and buy credits announce they are coming soon`() = runTest {
+    fun `notifications announce they are coming soon and buy credits opens the plans`() = runTest {
         val viewModel = viewModel(FakeRepository(updates()))
 
         viewModel.events.test {
@@ -238,7 +238,7 @@ class HomeViewModelTest {
             assertEquals(HomeUiEvent.ShowComingSoon(ComingSoonFeature.NOTIFICATIONS), awaitItem())
 
             viewModel.onAction(HomeUiAction.BuyCreditsClicked)
-            assertEquals(HomeUiEvent.ShowComingSoon(ComingSoonFeature.CREDITS), awaitItem())
+            assertEquals(HomeUiEvent.OpenPlans, awaitItem())
         }
     }
 

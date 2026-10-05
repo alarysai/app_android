@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.ChatMessageChanged -> _uiState.update { it.copy(chatMessage = action.message) }
             HomeUiAction.ChatSendClicked -> onChatSend()
             HomeUiAction.NotificationsClicked -> showComingSoon(ComingSoonFeature.NOTIFICATIONS)
-            HomeUiAction.BuyCreditsClicked -> showComingSoon(ComingSoonFeature.CREDITS)
+            HomeUiAction.BuyCreditsClicked -> _events.tryEmit(HomeUiEvent.OpenPlans)
             HomeUiAction.RetryCategories -> observeCategories()
             is HomeUiAction.CategoryClicked ->
                 _events.tryEmit(HomeUiEvent.OpenCategory(action.category.id, action.category.name))
