@@ -45,9 +45,9 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 
 | Módulo | Responsabilidade |
 | --- | --- |
-| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `GoogleSignInModule` (cliente OAuth web) |
+| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (abertura, depois login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `GoogleSignInModule` (cliente OAuth web) |
 | `core:common` | `Language`, `LocalizedText` (fallback para PT), `LanguageProvider` (idioma do perfil, senão o do aparelho) e `PreferredLanguageHolder`, `ContentList`, `ContentLoadError`/`ContentLoadException`, busca sem acento (`matchesSearch`), contratos de sessão (`SessionRepository`, `SessionUser`) e perfil (`UserProfileRepository`, `UserProfile`) |
-| `core:designsystem` | `AlarysTheme` (escuro, paleta do mockup), `AlarysBackground` (fundo com brilho azul/roxo), `GlassCard`, `AlarysLogo` (provisório, desenhado em código), `AlarysBottomBar` |
+| `core:designsystem` | `AlarysTheme` (escuro, paleta do mockup), `AlarysBackground` (fundo com brilho azul/roxo), `GlassCard`, `AlarysLogo` (imagem `ic_alarys` nos `mipmap` do próprio módulo), `AlarysBottomBar` |
 | `core:ui` | Estados de tela reutilizáveis (`LoadingContent`, `MessageContent`, `ContentLoadErrorContent`, `OfflineNotice`) e entrada por voz (`rememberSpeechInput`) |
 | `core:navigation` | Contratos de rota (`AppRoute`): abas `home`, `history`, `plans`, `club`, `profile`, `questionnaires/{categoryId}?categoryName=` e `questionnaire/{questionnaireId}?title=` |
 | `core:firebase` | Instância do Firestore (Hilt), `FirestoreContract` (campos e status), DTOs comuns (`LocalizedTextDto`, `ImageRefDto`), leitura defensiva em tempo real (`observeDocuments`) e única (`getRemoteDocumentOrNull`, `getRemoteDocuments`), documento em tempo real (`observeRemoteDocument`), exclusão (`deleteDocument`), `Throwable.toContentLoadError()`, sessão do Firebase Auth (`FirebaseSessionRepository`) e perfil em `users/{uid}` (`FirestoreUserProfileRepository`) |
@@ -59,6 +59,7 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 | `feature:history` | Aba Histórico: saldo de créditos, gerações e extrato do usuário logado |
 | `feature:auth` | Login (e-mail/senha e Google), cadastro, recuperação de senha, primeiro acesso e aba Perfil |
 | `feature:plans` | Aba Planos: assinaturas e pacotes de créditos pela Google Play (Play Billing 7) |
+| `feature:splash` | Abertura do app: vídeo de abertura (Media3/ExoPlayer) ou, sem vídeo, o logo animado |
 
 ### Como uma tela de conteúdo lê o Firestore
 
@@ -94,6 +95,17 @@ O Firestore mantém cache em disco (ligado por padrão). Quando a lista vem do c
 Textos do app em `values` (pt, padrão), `values-en` e `values-es`. O conteúdo usa o idioma do aparelho (`DeviceLanguageProvider`); idiomas fora de pt/en/es caem para pt. Quando o perfil do usuário existir, o campo `language` dele deve ter prioridade.
 
 ## Funcionalidades
+
+### Abertura (`feature:splash`)
+
+É a primeira tela ao abrir o app. Enquanto ela aparece, o `AppRootViewModel` já verifica a sessão; quando termina, o `AppRoot` faz um fade para login, primeiro acesso ou o app.
+
+- **Com vídeo:** coloque o arquivo em `app/src/main/assets/splash/intro.mp4` e gere o app de novo. Não precisa mudar código: `AssetSplashVideoRepository` encontra o arquivo, e sem ele a abertura volta a ser o logo. O vídeo ocupa a tela inteira, cortado para preencher (prefira vídeo vertical 9:16, H.264, curto e leve, porque vai dentro do APK). O som do arquivo é tocado. Tem botão **Pular**.
+- **Sem vídeo:** o `AlarysLogo` aparece com fade e um leve zoom por 1,8 s.
+- **Nunca prende o usuário:** termina quando o vídeo acaba, ao tocar em Pular, se o vídeo não puder ser tocado (arquivo ruim, codec), ou após 15 s mesmo que o vídeo não avise o fim. Os tempos ficam em `SplashTiming` (`SplashModule`).
+- Em segundo plano o vídeo pausa; ao girar o aparelho ou voltar ao app a abertura não se repete (`rememberSaveable` no `AppRoot`).
+- **Android 12+** sempre mostra antes a splash do sistema (ícone do app sobre uma cor). A cor dela é a mesma do fundo (`values-v31/themes.xml`), para não piscar.
+- Para trocar a origem do vídeo (por exemplo, baixar do Storage), basta outra implementação de `SplashVideoRepository`.
 
 ### Início (`feature:home`)
 
@@ -296,6 +308,9 @@ O tema é escuro sempre (a marca é escura), com ícones claros nas barras do si
 | `SignUpViewModelTest` | botão habilitado, criação, erros após a tentativa, e-mail em uso, voltar |
 | `ForgotPasswordViewModelTest` | envio, confirmação e contagem de 30 s, e-mail inválido, erro, eventos |
 | `ProfileViewModelTest` | primeiro acesso com nome do provedor, criação com idioma, nome vazio, edição sem sobrescrever o que foi digitado, falha ao salvar, sair |
+| `SplashViewModelTest` | logo sem vídeo e tempo dele, vídeo até o fim, Pular, vídeo com erro, limite de 15 s, `Finished` uma vez só e guardado até a tela coletar |
+| `AssetSplashVideoRepositoryTest` | vídeo presente, outro arquivo, pasta ausente, erro ao ler os assets |
+| `SplashScreenTest` (androidTest) | logo sem Pular, vídeo com Pular |
 | `AppRootViewModelTest` | sessão mantida abre o app no idioma do perfil, sessão não mantida é encerrada antes, saída limpa o idioma, primeiro acesso |
 | `AuthScreensTest` (androidTest) | login, botão desabilitado, erros do cadastro e aceite, confirmação da recuperação, primeiro acesso |
 | `HistoryMappersTest` | geração, valores estranhos viram neutros, todos os tipos de saída, transação e motivos, saldo ausente/negativo = 0 |

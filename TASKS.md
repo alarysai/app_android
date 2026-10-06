@@ -16,10 +16,12 @@ Uma task por vez: cada uma é testada no aparelho antes da próxima. Base: [`and
 | 8 | **Planos**: assinaturas e pacotes de créditos pela Google Play (Play Billing), aba Planos, "Adquirir créditos" da Início | — | ✅ app pronto (2026-10-04), compra só no debug; falta configurar o Play Console e o servidor que valida as compras ([docs/proposta-pagamentos-play.md](docs/proposta-pagamentos-play.md)) |
 | 9 | **Login e perfil**: e-mail/senha e Google (sem Apple), cadastro com aceite LGPD, recuperação de senha, primeiro acesso, aba Perfil, idioma do perfil, saudação | 8 | ✅ feita (2026-10-04); falta ativar o provedor Google no console e validar com uma conta real; campos de consentimento propostos em [docs/proposta-usuarios-login.md](docs/proposta-usuarios-login.md) |
 | 10 | **Histórico e créditos** (só leitura; dono pode apagar itens do histórico) | 8 | ✅ feita (2026-10-03) sem login: a aba mostra "Entre na sua conta" até a Task 9; dados reais só depois do serviço de geração |
+| 11 | **Abertura (splash)** preparada para vídeo: `assets/splash/intro.mp4` toca em tela cheia com Pular; sem o arquivo, logo animado | — | ✅ feita (2026-10-06); falta o vídeo oficial |
 
 Pendências externas conhecidas:
 
-- Ícone do app e logo oficial em vetor (hoje: ícone padrão do sistema e um logo desenhado em código).
+- Logo oficial em vetor (hoje: imagens PNG `icon_app` e `ic_alarys`).
+- Vídeo de abertura oficial (`app/src/main/assets/splash/intro.mp4`).
 - Descrição das categorias ("Crie e edite textos com IA"): exige um campo novo em `questionnaireCategories` no painel.
 - Imagens (`image`, `icon`) só depois que o Storage for ativado (plano Blaze).
 - Serviço de geração (IA, créditos, histórico) ainda não existe.

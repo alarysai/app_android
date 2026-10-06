@@ -63,6 +63,7 @@ dependencies {
     implementation(project(":feature:history"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:plans"))
+    implementation(project(":feature:splash"))
 
     implementation(platform(libs.compose.bom))
 

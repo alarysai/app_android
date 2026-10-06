@@ -97,6 +97,7 @@ Add `core:network` or `core:database` only when a feature really needs them.
 - `feature:history`
 - `feature:auth`
 - `feature:plans`
+- `feature:splash`
 
 ### Dependency rules
 - Presentation depends on Domain when needed.
