@@ -197,7 +197,7 @@ Título "Club AI" e duas abas no topo: **Dicas** (padrão) e **Anunciantes**. A 
 - Consulta `advertisers` com `status == "active"`, por `order` (índice `status, order`), em tempo real; desempate por ID.
 - Descartados: inativos, sem nome e sem imagem, e link que não seja `https://` (o app só abre links seguros). O `type` é arrumado como no painel (`tidyType`: sem espaços nas pontas, espaços simples).
 - **Agrupamento por tipo** (`GroupAdvertisersByTypeUseCase`, mesma regra do `advertiserTypes` do painel): "Patrocínio", "patrocinio " e "PATROCINIO" são um tipo só, mostrado com a primeira grafia encontrada. Grupos em ordem alfabética (colação pt-BR); dentro do grupo, a ordem do painel. Sem tipo vai para o grupo "Outros", no fim.
-- Card: logo (ou a inicial), nome e ícone de abrir. Sem nome (só imagem), mostra o domínio do link. Tocar abre o link numa **Custom Tab** (`androidx.browser`); sem navegador compatível, abre com qualquer app que trate o link.
+- Card **com imagem**: a imagem vira uma faixa na **metade de cima**, de borda a borda, cortada para preencher (`ContentScale.Crop`) e recortada pelos cantos arredondados do card; nome e ícone de abrir na metade de baixo, em uma linha. O card com imagem tem 96 dp de altura (o card sem imagem, 76 dp, + 25%). Prefira imagens horizontais (o painel aceita qualquer proporção; o que sobra é cortado). **Sem imagem**: a inicial, o nome (até 2 linhas) e o ícone de abrir. Sem nome (só imagem), mostra o domínio do link. Tocar abre o link numa **Custom Tab** (`androidx.browser`); sem navegador compatível, abre com qualquer app que trate o link.
 - Estados: carregando, lista, vazio ("Nenhum anunciante por enquanto"), erro com "Tentar de novo" e faixa de offline.
 
 ### Histórico e créditos (`feature:history`, aba Histórico)
@@ -325,7 +325,7 @@ O tema é escuro sempre (a marca é escura), com ícones claros nas barras do si
 | `GroupAdvertisersByTypeUseCaseTest` | mesmo tipo sem caixa/acento/espaço com a primeira grafia, ordem alfabética pt, ordem interna, sem tipo no fim, lista vazia |
 | `AdvertiserRepositoryImplTest` | ordenação, descarte de inativos e links inseguros, cache, erro do Firestore |
 | `AdvertisersViewModelTest` | loading, grupos, vazio e offline, abrir link, erro e retry |
-| `AdvertisersScreenTest` (androidTest) | grupos com título e "Outros", domínio para anunciante só com imagem, toque, "Tentar de novo", vazio |
+| `AdvertisersScreenTest` (androidTest) | grupos com título e "Outros", domínio para anunciante só com imagem, faixa da imagem com o nome, inicial sem imagem, toque, "Tentar de novo", vazio |
 | `TipMappersTest` | categoria ativa/inativa/sem nome; dica ativa/inativa/sem categoria/sem texto; imagem; idiomas desconhecidos |
 | `TipRepositoryImplTest` | ordenação de categorias e dicas, descarte de inválidos, "Todas" sem categoria, descarte de outra categoria, cache, erro do Firestore |
 | `TipsViewModelTest` | loading, chips e dicas no idioma do usuário com nome da categoria, nomes que chegam depois, troca de categoria, mesma categoria sem nova consulta, categoria desativada volta para "Todas", vazio e offline, categorias com erro, retry |

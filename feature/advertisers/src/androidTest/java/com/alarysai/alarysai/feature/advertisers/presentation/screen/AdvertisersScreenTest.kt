@@ -2,12 +2,14 @@ package com.alarysai.alarysai.feature.advertisers.presentation.screen
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.alarysai.alarysai.core.common.content.ContentLoadError
 import com.alarysai.alarysai.core.designsystem.theme.AlarysTheme
 import com.alarysai.alarysai.feature.advertisers.presentation.action.AdvertisersUiAction
+import com.alarysai.alarysai.feature.advertisers.presentation.components.ADVERTISER_BANNER_TAG
 import com.alarysai.alarysai.feature.advertisers.presentation.state.AdvertiserGroupUi
 import com.alarysai.alarysai.feature.advertisers.presentation.state.AdvertiserItemUi
 import com.alarysai.alarysai.feature.advertisers.presentation.state.AdvertisersUiState
@@ -47,6 +49,23 @@ class AdvertisersScreenTest {
         composeRule.onNodeWithText("Loja X").assertIsDisplayed()
         composeRule.onNodeWithText("Outros").assertIsDisplayed()
         composeRule.onNodeWithText("escolay.com.br").assertIsDisplayed()
+    }
+
+    @Test
+    fun anAdvertiserWithAnImageShowsTheBannerAndTheName() {
+        val withBanner = shop.copy(imageUrl = "https://firebasestorage.googleapis.com/v0/b/b/o/logo.png?alt=media")
+        setScreen(AdvertisersUiState.Success(listOf(AdvertiserGroupUi("Parceiro", listOf(withBanner))), isOffline = false))
+
+        composeRule.onNodeWithTag(ADVERTISER_BANNER_TAG).assertIsDisplayed()
+        composeRule.onNodeWithText("Loja X").assertIsDisplayed()
+    }
+
+    @Test
+    fun anAdvertiserWithoutAnImageShowsTheInitialInstead() {
+        setScreen(AdvertisersUiState.Success(listOf(AdvertiserGroupUi("Parceiro", listOf(shop))), isOffline = false))
+
+        composeRule.onNodeWithTag(ADVERTISER_BANNER_TAG).assertDoesNotExist()
+        composeRule.onNodeWithText("L").assertIsDisplayed()
     }
 
     @Test
