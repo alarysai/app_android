@@ -3,6 +3,7 @@ package com.alarysai.alarysai.feature.questionnaires.presentation.run.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,10 @@ import com.alarysai.alarysai.feature.questionnaires.R
 
 private val ButtonShape = RoundedCornerShape(12.dp)
 
+/** Size of the square back button; its arrow fills the button without the default side padding. */
+private val BackButtonSize = 56.dp
+private val BackIconSize = 26.dp
+
 /** Back arrow and "Continue" (or "Review request" on the last question), disabled until the answer is valid. */
 @Composable
 fun RunBottomBar(
@@ -48,8 +53,18 @@ fun RunBottomBar(
             .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        OutlinedButton(onClick = onBack, shape = ButtonShape, modifier = Modifier.size(56.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.run_back))
+        OutlinedButton(
+            onClick = onBack,
+            shape = ButtonShape,
+            // The default 24 dp side padding would leave the arrow only 8 dp in a 56 dp button.
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.size(BackButtonSize),
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.run_back),
+                modifier = Modifier.size(BackIconSize),
+            )
         }
         Button(
             onClick = onContinue,
