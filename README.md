@@ -45,7 +45,7 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 
 | Módulo | Responsabilidade |
 | --- | --- |
-| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (abertura, depois login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: Dicas + Anunciantes), `GoogleSignInModule` (cliente OAuth web) |
+| `app` | `Application` (Hilt), `MainActivity`, `AppRoot`/`AppRootViewModel` (abertura, depois login obrigatório: login, primeiro acesso ou o app), `AlarysNavHost` (barra inferior e destinos), `TopLevelTab` (abas), `ClubScreen` (aba Club AI: carrossel de dicas + anunciantes), `GoogleSignInModule` (cliente OAuth web) |
 | `core:common` | `Language`, `LocalizedText` (fallback para PT), `LanguageProvider` (idioma do perfil, senão o do aparelho) e `PreferredLanguageHolder`, `ContentList`, `ContentLoadError`/`ContentLoadException`, busca sem acento (`matchesSearch`), contratos de sessão (`SessionRepository`, `SessionUser`) e perfil (`UserProfileRepository`, `UserProfile`) |
 | `core:designsystem` | `AlarysTheme` (escuro, paleta do mockup), `AlarysBackground` (fundo com brilho azul/roxo), `GlassCard`, `AlarysLogo` (imagem `ic_alarys` nos `mipmap` do próprio módulo), `AlarysBottomBar` |
 | `core:ui` | Estados de tela reutilizáveis (`LoadingContent`, `MessageContent`, `ContentLoadErrorContent`, `OfflineNotice`) e entrada por voz (`rememberSpeechInput`) |
@@ -54,7 +54,7 @@ MVVM com Clean Architecture pragmática, modularizado por feature (detalhes em [
 | `core:testing` | `MainDispatcherRule`, JUnit, coroutines-test, MockK, Turbine |
 | `feature:home` | Tela Início: cabeçalho, busca, saudação, uso do plano, categorias de questionário (Firestore) e chat |
 | `feature:questionnaires` | Questionários publicados de uma categoria e a execução de um questionário (passos e fluxo) |
-| `feature:tips` | Dicas com filtro por categoria (aba Club AI) |
+| `feature:tips` | Carrossel de dicas no topo da aba Club AI |
 | `feature:advertisers` | Anunciantes agrupados por tipo, link em Custom Tab (aba Club AI) |
 | `feature:history` | Aba Histórico: saldo de créditos, gerações e extrato do usuário logado |
 | `feature:auth` | Login (e-mail/senha e Google), cadastro, recuperação de senha, primeiro acesso e aba Perfil |
@@ -177,19 +177,20 @@ Segue os mockups "Criar imagem" com as cores da marca. **Cada tela é montada a 
 
 ### Aba Club AI (`app/navigation/ClubScreen.kt`)
 
-Título "Club AI" e duas abas no topo: **Dicas** (padrão) e **Anunciantes**. A aba escolhida sobrevive à rotação. O `ClubScreen` fica no `app` porque junta duas features, que não podem depender uma da outra; as telas de cada feature são só conteúdo, sem barra de título própria.
+Título "Club AI", o **carrossel de dicas** no topo e os **anunciantes** embaixo, ocupando o resto da tela (a lista dos anunciantes rola; o carrossel fica fixo). Sem abas. O `ClubScreen` fica no `app` porque junta duas features, que não podem depender uma da outra; as telas de cada feature são só conteúdo, sem barra de título própria.
 
 ### Dicas (`feature:tips`)
 
-- Primeira aba do Club AI (rota `club`).
-- **Chips de categoria:** "Todas" e cada categoria ativa (`tipCategories`, `status == "active"`, por `order`, em tempo real). Se as categorias falharem ou não houver nenhuma, a fileira de chips some e as dicas continuam.
-- **Dicas:** em tempo real, por `order` com desempate por ID.
-  - "Todas": consulta `tips` com `status == "active"` (índice `status, order`). Cada card mostra o nome da categoria acima do texto.
-  - Uma categoria: consulta com `status == "active"` e `categoryId` (índice `status, categoryId, order`). O nome da categoria não se repete no card.
-  - Se a categoria escolhida for desativada no painel enquanto a tela está aberta, a seleção volta para "Todas".
+- Topo da aba Club AI (rota `club`).
+- **Dicas:** todas as ativas (`tips` com `status == "active"`, índice `status, order`), em tempo real, por `order` com desempate por ID. Cada card mostra o nome da categoria (`tipCategories` ativas, em tempo real) acima do texto; se as categorias falharem, as dicas continuam sem o nome.
+- **Carrossel** (`TipsCarousel`): uma dica por vez, arrastando para o lado, **sem fim nos dois sentidos** (`CarouselPaging`: o pager começa no meio de um número enorme de páginas e cada página mostra `tips[página % total]`). Um pedaço das dicas vizinhas aparece nas bordas.
+  - **Passa sozinho a cada 5 s** (`TIP_AUTO_ADVANCE_MILLIS`). Qualquer troca de dica (sozinha ou pelo usuário) recomeça a contagem, e o carrossel não se mexe enquanto o usuário arrasta. O usuário pode voltar para reler quando quiser.
+  - **Pontinhos** embaixo: um por dica, o atual mais comprido e destacado. Leitor de tela: "Dica 2 de 5".
+  - Altura fixa (168 dp), para a lista de baixo não pular: o texto vai até 4 linhas e termina com "…"; a imagem da dica (quando houver) aparece em miniatura à direita.
+  - Uma dica só: fica parada, sem pontinhos.
 - **Idioma:** mostra todas as dicas ativas. As que não têm tradução completa no idioma do usuário aparecem em português com o selo "Em português" (mesmo critério dos questionários).
-- Card: ícone de lâmpada, categoria (em "Todas"), texto e imagem (quando houver). Descartadas: inativas, sem categoria, sem texto em PT.
-- Estados: carregando, lista, vazio ("Nenhuma dica por aqui ainda"), erro com "Tentar de novo" (assina de novo as duas consultas) e faixa de offline.
+- Descartadas: inativas, sem categoria, sem texto em PT.
+- Estados: carregando (na altura do carrossel), carrossel, **sem dicas = a seção some** (os anunciantes sobem), erro em uma linha com "Tentar de novo" (`ContentLoadErrorBanner`, assina de novo as duas consultas) e faixa de offline.
 
 ### Anunciantes (`feature:advertisers`)
 
@@ -328,8 +329,9 @@ O tema é escuro sempre (a marca é escura), com ícones claros nas barras do si
 | `AdvertisersScreenTest` (androidTest) | grupos com título e "Outros", domínio para anunciante só com imagem, faixa da imagem com o nome, inicial sem imagem, toque, "Tentar de novo", vazio |
 | `TipMappersTest` | categoria ativa/inativa/sem nome; dica ativa/inativa/sem categoria/sem texto; imagem; idiomas desconhecidos |
 | `TipRepositoryImplTest` | ordenação de categorias e dicas, descarte de inválidos, "Todas" sem categoria, descarte de outra categoria, cache, erro do Firestore |
-| `TipsViewModelTest` | loading, chips e dicas no idioma do usuário com nome da categoria, nomes que chegam depois, troca de categoria, mesma categoria sem nova consulta, categoria desativada volta para "Todas", vazio e offline, categorias com erro, retry |
-| `TipsScreenTest` (androidTest) | "Todas", dica com categoria e selo, toque nos chips, sem chips, "Tentar de novo" |
+| `TipsViewModelTest` | loading, dicas no idioma do usuário com nome da categoria, nomes que chegam depois, categoria desativada perde o nome, vazio e offline, categorias com erro, retry |
+| `CarouselPagingTest` | várias dicas sem fim começando na primeira, volta nos dois sentidos, uma dica parada, nenhuma dica |
+| `TipsScreenTest` (androidTest) | primeira dica com categoria, selo e pontinhos, troca sozinha a cada 5 s e volta para a primeira, arrastar nos dois sentidos sem fim, uma dica sem pontinhos, sem dicas não ocupa espaço, "Tentar de novo" |
 | `QuestionnaireMapperTest` | publicado/rascunho, sem título ou categoria, descrição vazia, idiomas desconhecidos, imagem |
 | `QuestionnaireRepositoryImplTest` | lista: categoria pedida, ordenação, descarte de inválidos e de outra categoria, cache, erro. Carga: passos ordenados e inválidos descartados; ausente, rascunho e sem passos = indisponível; `PERMISSION_DENIED` = indisponível; sem rede = offline |
 | `QuestionnairesViewModelTest` | título pela rota, idioma e selo "Em português", offline, vazio, erro, sem `categoryId`, retry, abrir questionário |

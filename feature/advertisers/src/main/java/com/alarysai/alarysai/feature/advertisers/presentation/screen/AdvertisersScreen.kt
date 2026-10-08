@@ -60,7 +60,7 @@ fun AdvertisersScreenRoute(
     AdvertisersScreen(uiState = uiState, onAction = viewModel::onAction, modifier = modifier)
 }
 
-/** Content only: the "Club AI" tab provides the title and the Tips/Advertisers tabs. */
+/** Content only: the "Club AI" tab provides the title and puts the tips carousel above. */
 @Composable
 fun AdvertisersScreen(
     uiState: AdvertisersUiState,

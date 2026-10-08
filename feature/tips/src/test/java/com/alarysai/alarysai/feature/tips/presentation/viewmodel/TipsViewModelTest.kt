@@ -11,7 +11,6 @@ import com.alarysai.alarysai.feature.tips.domain.model.Tip
 import com.alarysai.alarysai.feature.tips.domain.model.TipCategory
 import com.alarysai.alarysai.feature.tips.domain.repository.TipRepository
 import com.alarysai.alarysai.feature.tips.presentation.action.TipsUiAction
-import com.alarysai.alarysai.feature.tips.presentation.state.TipCategoryUi
 import com.alarysai.alarysai.feature.tips.presentation.state.TipItemUi
 import com.alarysai.alarysai.feature.tips.presentation.state.TipsContent
 import kotlinx.coroutines.flow.Flow
@@ -41,7 +40,7 @@ class TipsViewModelTest {
     /** Buffered so tryEmit succeeds while the ViewModel is subscribed. */
     private fun <T> updates() = MutableSharedFlow<ContentList<T>>(extraBufferCapacity = 8)
 
-    /** Tips flows are handed out per subscription, so category switches and retries can be followed. */
+    /** Tips flows are handed out per subscription, so retries can be followed. */
     private class FakeRepository(
         private val categories: Flow<ContentList<TipCategory>>,
         vararg tips: Flow<ContentList<Tip>>,
@@ -65,17 +64,16 @@ class TipsViewModelTest {
         TipsViewModel(repository, FixedLanguage(language))
 
     @Test
-    fun `starts with all tips loading and no chips`() {
+    fun `starts loading all tips`() {
         val repository = FakeRepository(updates(), updates())
         val viewModel = viewModel(repository)
 
         assertEquals(TipsContent.Loading, viewModel.uiState.value.content)
-        assertEquals(emptyList<TipCategoryUi>(), viewModel.uiState.value.categories)
         assertEquals(listOf<String?>(null), repository.requestedCategoryIds)
     }
 
     @Test
-    fun `shows chips and all tips with their category name in the user language`() {
+    fun `shows all tips with their category name in the user language`() {
         val categories = updates<TipCategory>()
         val tips = updates<Tip>()
         val viewModel = viewModel(FakeRepository(categories, tips), Language.EN)
@@ -83,8 +81,6 @@ class TipsViewModelTest {
         categories.tryEmit(ContentList(listOf(ethics, knowledge), isFromCache = false))
         tips.tryEmit(ContentList(listOf(citeSources, askExamples), isFromCache = false))
 
-        val state = viewModel.uiState.value
-        assertEquals(listOf(TipCategoryUi("etica", "Ethics"), TipCategoryUi("conhecimento", "Conhecimento")), state.categories)
         assertEquals(
             TipsContent.Success(
                 tips = listOf(
@@ -93,7 +89,7 @@ class TipsViewModelTest {
                 ),
                 isOffline = false,
             ),
-            state.content,
+            viewModel.uiState.value.content,
         )
     }
 
@@ -111,44 +107,16 @@ class TipsViewModelTest {
     }
 
     @Test
-    fun `selecting a category queries it and hides the category label`() {
+    fun `a deactivated category drops its label`() {
         val categories = updates<TipCategory>()
-        val ethicsTips = updates<Tip>()
-        val repository = FakeRepository(categories, updates(), ethicsTips)
-        val viewModel = viewModel(repository)
-        categories.tryEmit(ContentList(listOf(ethics, knowledge), isFromCache = false))
-
-        viewModel.onAction(TipsUiAction.CategorySelected("etica"))
-        assertEquals(TipsContent.Loading, viewModel.uiState.value.content)
-        ethicsTips.tryEmit(ContentList(listOf(citeSources), isFromCache = false))
-
-        assertEquals("etica", viewModel.uiState.value.selectedCategoryId)
-        assertEquals(listOf<String?>(null, "etica"), repository.requestedCategoryIds)
-        assertEquals(null, (viewModel.uiState.value.content as TipsContent.Success).tips.single().categoryName)
-    }
-
-    @Test
-    fun `selecting the current category again does not query again`() {
-        val repository = FakeRepository(updates(), updates())
-        val viewModel = viewModel(repository)
-
-        viewModel.onAction(TipsUiAction.CategorySelected(null))
-
-        assertEquals(listOf<String?>(null), repository.requestedCategoryIds)
-    }
-
-    @Test
-    fun `a selected category that is deactivated goes back to all`() {
-        val categories = updates<TipCategory>()
-        val repository = FakeRepository(categories, updates(), updates(), updates())
-        val viewModel = viewModel(repository)
-        categories.tryEmit(ContentList(listOf(ethics, knowledge), isFromCache = false))
-        viewModel.onAction(TipsUiAction.CategorySelected("conhecimento"))
-
+        val tips = updates<Tip>()
+        val viewModel = viewModel(FakeRepository(categories, tips))
         categories.tryEmit(ContentList(listOf(ethics), isFromCache = false))
+        tips.tryEmit(ContentList(listOf(citeSources), isFromCache = false))
 
-        assertEquals(null, viewModel.uiState.value.selectedCategoryId)
-        assertEquals(listOf<String?>(null, "conhecimento", null), repository.requestedCategoryIds)
+        categories.tryEmit(ContentList(emptyList(), isFromCache = false))
+
+        assertEquals(null, (viewModel.uiState.value.content as TipsContent.Success).tips.single().categoryName)
     }
 
     @Test
@@ -164,15 +132,14 @@ class TipsViewModelTest {
     }
 
     @Test
-    fun `failing categories hide the chips but keep the tips`() {
+    fun `failing categories keep the tips without labels`() {
         val failingCategories = flow<ContentList<TipCategory>> { throw ContentLoadException(ContentLoadError.UNKNOWN) }
         val tips = updates<Tip>()
         val viewModel = viewModel(FakeRepository(failingCategories, tips))
 
         tips.tryEmit(ContentList(listOf(citeSources), isFromCache = false))
 
-        assertEquals(emptyList<TipCategoryUi>(), viewModel.uiState.value.categories)
-        assertEquals(1, (viewModel.uiState.value.content as TipsContent.Success).tips.size)
+        assertEquals(null, (viewModel.uiState.value.content as TipsContent.Success).tips.single().categoryName)
     }
 
     @Test
