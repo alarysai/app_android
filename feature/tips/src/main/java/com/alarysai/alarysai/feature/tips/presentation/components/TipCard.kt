@@ -31,7 +31,7 @@ import com.alarysai.alarysai.feature.tips.R
 import com.alarysai.alarysai.feature.tips.presentation.state.TipItemUi
 
 /** Lines of tip text that fit the carousel height; longer tips end with "…". */
-private const val TIP_TEXT_MAX_LINES = 4
+private const val TIP_TEXT_MAX_LINES = 3
 
 /** One tip, sized by the caller (the carousel gives every card the same height). */
 @Composable

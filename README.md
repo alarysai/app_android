@@ -186,7 +186,7 @@ Título "Club AI", o **carrossel de dicas** no topo e os **anunciantes** embaixo
 - **Carrossel** (`TipsCarousel`): uma dica por vez, arrastando para o lado, **sem fim nos dois sentidos** (`CarouselPaging`: o pager começa no meio de um número enorme de páginas e cada página mostra `tips[página % total]`). Um pedaço das dicas vizinhas aparece nas bordas.
   - **Passa sozinho a cada 5 s** (`TIP_AUTO_ADVANCE_MILLIS`). Qualquer troca de dica (sozinha ou pelo usuário) recomeça a contagem, e o carrossel não se mexe enquanto o usuário arrasta. O usuário pode voltar para reler quando quiser.
   - **Pontinhos** embaixo: um por dica, o atual mais comprido e destacado. Leitor de tela: "Dica 2 de 5".
-  - Altura fixa (168 dp), para a lista de baixo não pular: o texto vai até 4 linhas e termina com "…"; a imagem da dica (quando houver) aparece em miniatura à direita.
+  - Altura fixa (144 dp), para a lista de baixo não pular: o texto vai até 3 linhas e termina com "…"; a imagem da dica (quando houver) aparece em miniatura à direita.
   - Uma dica só: fica parada, sem pontinhos.
 - **Idioma:** mostra todas as dicas ativas. As que não têm tradução completa no idioma do usuário aparecem em português com o selo "Em português" (mesmo critério dos questionários).
 - Descartadas: inativas, sem categoria, sem texto em PT.

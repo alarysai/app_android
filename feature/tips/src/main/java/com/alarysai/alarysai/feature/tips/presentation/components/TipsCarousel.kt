@@ -43,7 +43,7 @@ const val TIPS_CAROUSEL_DOTS_TAG = "tips_carousel_dots"
 const val TIP_AUTO_ADVANCE_MILLIS = 5_000L
 
 /** Fixed height, so the screen below does not jump when tips of different lengths pass. */
-val TipCarouselHeight: Dp = 168.dp
+val TipCarouselHeight: Dp = 144.dp
 
 /**
  * Tips one at a time, swiping sideways, endless in both directions. Every
