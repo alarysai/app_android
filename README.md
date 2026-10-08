@@ -101,6 +101,7 @@ Textos do app em `values` (pt, padrão), `values-en` e `values-es`. O conteúdo 
 É a primeira tela ao abrir o app. Enquanto ela aparece, o `AppRootViewModel` já verifica a sessão; quando termina, o `AppRoot` faz um fade para login, primeiro acesso ou o app.
 
 - **Com vídeo:** coloque o arquivo em `app/src/main/assets/splash/intro.mp4` e gere o app de novo. Não precisa mudar código: `AssetSplashVideoRepository` encontra o arquivo, e sem ele a abertura volta a ser o logo. O vídeo ocupa a tela inteira, cortado para preencher (prefira vídeo vertical 9:16, H.264, curto e leve, porque vai dentro do APK). O som do arquivo é tocado. Tem botão **Pular**.
+- **Vídeo atual** (desde 2026-10-08): `Splash_Logo_Alarys`, logo animado da Alarys, vertical 1080×1920, H.264 + áudio AAC, 3,6 s, 1,7 MB. Para trocar, substitua o `intro.mp4` mantendo o nome.
 - **Sem vídeo:** o `AlarysLogo` aparece com fade e um leve zoom por 1,8 s.
 - **Nunca prende o usuário:** termina quando o vídeo acaba, ao tocar em Pular, se o vídeo não puder ser tocado (arquivo ruim, codec), ou após 15 s mesmo que o vídeo não avise o fim. Os tempos ficam em `SplashTiming` (`SplashModule`).
 - Em segundo plano o vídeo pausa; ao girar o aparelho ou voltar ao app a abertura não se repete (`rememberSaveable` no `AppRoot`).
